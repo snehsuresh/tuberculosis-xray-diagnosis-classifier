@@ -21,7 +21,10 @@ list_of_files=[
     "setup.cfg",
     "pyproject.toml",
     "tox.ini",
-    "experiment/experiments.ipynb"
+    "experiment/experiments.ipynb",
+    "src/exception/init.py",
+    "src/exception/exception.py",
+    "src/logger/logging.py"
 
 ]
 
