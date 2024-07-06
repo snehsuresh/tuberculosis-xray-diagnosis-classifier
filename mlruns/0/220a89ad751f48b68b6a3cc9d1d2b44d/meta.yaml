@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/snehsuresh/Desktop/ineuron%20course/mlops-project/mlruns/0/220a89ad751f48b68b6a3cc9d1d2b44d/artifacts
+end_time: 1720230261968
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 220a89ad751f48b68b6a3cc9d1d2b44d
+run_name: capricious-rook-4
+run_uuid: 220a89ad751f48b68b6a3cc9d1d2b44d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1720230259823
+status: 3
+tags: []
+user_id: snehsuresh

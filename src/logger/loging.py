@@ -17,4 +17,3 @@ logging.basicConfig(level=logging.INFO,
                     
 )
             #[2024-01-10 15:57:26,997] 6 root - INFO -  this my second tesgting
-
