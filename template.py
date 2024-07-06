@@ -24,7 +24,7 @@ list_of_files=[
     "experiment/experiments.ipynb",
     "src/exception/init.py",
     "src/exception/exception.py",
-    "src/logger/logging.py"
+    "src/logger/loging.py"
 
 ]
 
