@@ -3,6 +3,6 @@ WORKDIR /app
 COPY . /app
 
 RUN apt update -y
-
-RUN apt-get update && pip install -r requirements.txt
+# install gcc along with requirements as python slim buster is removing it to be lightweight
+RUN apt-get update &&  apt-get install -y gcc && pip install -r requirements.txt
 CMD ["python3", "app.py"]

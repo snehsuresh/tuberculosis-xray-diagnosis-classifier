@@ -8,7 +8,7 @@ from src.utils.utils import load_object
 from urllib.parse import urlparse
 from sklearn.metrics import mean_squared_error,mean_absolute_error,r2_score
 from src.logger.loging import logging
-from src.exception. exception import customexception
+from src.exception.exception import customexception
 
 class ModelEvaluation:
     def __init__(self):

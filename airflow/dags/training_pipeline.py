@@ -4,7 +4,7 @@ from textwrap import dedent
 import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from src.DimondPricePrediction.pipelines.training_pipeline import TrainingPipeline
+from src.pipeline.training_pipeline import TrainingPipeline
 
 training_pipeline=TrainingPipeline()
 
@@ -41,8 +41,8 @@ with DAG(
         test_arr=np.array(data_transformation_artifact["test_arr"])
         training_pipeline.start_model_training(train_arr,test_arr)
     
-    ## you have to config azure blob
-    def push_data_to_azureblob(**kwargs):
+    ## you have to config azure blob or s3 
+    def push_data_to_s3(**kwargs):
         import os
         bucket_name="reposatiory_name"
         artifact_folder="/app/artifacts"

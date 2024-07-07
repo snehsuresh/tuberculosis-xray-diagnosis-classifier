@@ -1,9 +1,12 @@
 pandas
 scikit-learn
 numpy
-seaborn 
-flask
+seaborn
+ipykernel
+Flask
+#this is more stable version
 mlflow==2.2.2
 dvc
-ipykernel
-xgboost
+apache-airflow
+
+-e .

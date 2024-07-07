@@ -1,39 +1,47 @@
 import os
 from pathlib import Path
 
-package_name = "mongodb_connect"
+package_name="DimondPricePrediction"
 
 list_of_files=[
-
-    ".github/workflows/ci.yaml",
-    "src/__init__.py",
-    f"src/{package_name}/__init__.py", 
-    f"src/{package_name}/mongo_crud.py", 
-    "src/components/__init__.py",
-    "tests/unit/__init__.py",
-    "tests/unit/unit.py",
-    "tests/integration/__init__.py",
-    "tests/integration/int.py",
-    "init_setup.sh",
+    "github/workflows/.gitkeep",
+    f"src/{package_name}/__init__.py",
+    f"src/{package_name}/components/__init__.py",
+    f"src/{package_name}/components/data_ingestion.py",
+    f"src/{package_name}/components/data_transformation.py",
+    f"src/{package_name}/components/model_trainer.py",
+    f"src/{package_name}/pipelines/__init__.py",
+    f"src/{package_name}/pipelines/training_pipeline.py",
+    f"src/{package_name}/pipelines/prediction_pipeline.py",
+    f"src/{package_name}/logger.py",
+    f"src/{package_name}/exception.py",
+    f"src/{package_name}/utils/__init__.py",
+    "notebooks/research.ipynb",
+    "notebooks/data/.gitkeep",
     "requirements.txt",
-    "requirements_dev.txt",
     "setup.py",
-    "setup.cfg",
-    "pyproject.toml",
-    "tox.ini",
-    "experiment/experiments.ipynb",
-    "src/exception/init.py",
-    "src/exception/exception.py",
-    "src/logger/loging.py"
-
+    "init_setup.sh",
 ]
 
-for filepath in list_of_files:
-    filepath = Path(filepath)
-    filedir, filename = os.path.split(filepath)
-    if filedir != "":
-        os.makedirs(filedir, exist_ok=True)
 
+# here will create a directory
+
+for filepath in list_of_files:
+    filepath=Path(filepath)
+    filedir,filename=os.path.split(filepath)
+    
+    """ how exist_ok works:if "directory" already exists, 
+    os.makedirs() will not raise an error, and it will do nothing. 
+    If "my_directory" doesn't exist, it will create the directory.
+    """
+    if filedir != "":
+        os.makedirs(filedir,exist_ok=True)
+        
     if (not os.path.exists(filepath)) or (os.path.getsize(filepath) == 0):
-        with open(filepath, "w") as f:
-            pass # create an empty file
+        with open(filepath,"w") as f:
+            pass
+    else:
+        print("file already exists")
+
+# here will use the file handling
+
