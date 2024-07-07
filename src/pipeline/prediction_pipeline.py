@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd
 from src.exception.exception import customexception
-from src.logger import loging
+from src.logger.loging import logging
 from src.utils.utils import load_object
 
 
@@ -68,7 +68,7 @@ class CustomData:
                     'clarity':[self.clarity]
                 }
                 df = pd.DataFrame(custom_data_input_dict)
-                loging.info('Dataframe Gathered')
+                logging.info('Dataframe Gathered')
                 return df
             except Exception as e:
                 logging.info('Exception Occured in prediction pipeline')
