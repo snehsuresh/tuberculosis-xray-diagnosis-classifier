@@ -12,18 +12,18 @@ with DAG(
     "gemstone_training_pipeline",
     default_args={"retries": 2},
     description="it is my training pipeline",
-    schedule="@weekly",# here you can test based on hour or mints but make sure here you container is up and running
+    schedule="@weekly",  # here you can test based on hour or mints but make sure here you container is up and running
     start_date=pendulum.datetime(2024, 7, 7, tz="UTC"),
     catchup=False,
-    tags=["machine_learning ","classification","gemstone"],
+    tags=["machine_learning ", "classification", "gemstone"],
 ) as dag:
     
     dag.doc_md = __doc__
     
     def data_ingestion(**kwargs):
         ti = kwargs["ti"]
-        train_data_path,test_data_path=training_pipeline.start_data_ingestion()
-        ti.xcom_push("data_ingestion_artifact", {"train_data_path":train_data_path,"test_data_path":test_data_path})
+        train_data_path, test_data_path=training_pipeline.start_data_ingestion()
+        ti.xcom_push("data_ingestion_artifact", {"train_data_path": train_data_path,"test_data_path":test_data_path})
 
     def data_transformations(**kwargs):
         ti = kwargs["ti"]
