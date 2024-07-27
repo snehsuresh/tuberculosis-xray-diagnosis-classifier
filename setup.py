@@ -15,7 +15,7 @@ def get_requirements(file_path:str)->List[str]:
     return requirements"""
 
 setup(
-    name="DimondPricePrediction",
+    name="XRayDiagnosisPrediciton",
     version="0.0.1",
     author="sneh pillai",
     author_email="snehs=pillai@gmail.com",

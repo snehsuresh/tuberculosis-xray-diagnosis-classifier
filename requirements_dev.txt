@@ -1,12 +1,16 @@
 pandas
 scikit-learn
 numpy
+opencv-python
+imbalanced-learn
 seaborn 
 flask
 mlflow==2.2.2
 dvc
 ipykernel
 xgboost
+tensorflow
+keras
 
 # dev requirements -
 

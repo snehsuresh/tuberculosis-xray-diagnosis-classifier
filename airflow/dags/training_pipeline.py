@@ -1,5 +1,4 @@
 from __future__ import annotations
-import json
 from textwrap import dedent
 import pendulum
 from airflow import DAG
@@ -9,24 +8,32 @@ from src.pipeline.training_pipeline import TrainingPipeline
 training_pipeline = TrainingPipeline()
 
 with DAG(
-    "gemstone_training_pipeline",
+    "xray_training_pipeline",
     default_args={"retries": 2},
-    description="it is my training pipeline",
+    description="X-ray diagnosis training pipeline",
     # here you can test based on hour or mints but make sure here you container is up and running
     schedule="@weekly",
-    start_date=pendulum.datetime(2024, 7, 7, tz="UTC"),
+    start_date=pendulum.datetime(2024, 7, 26, tz="UTC"),
     catchup=False,
-    tags=["machine_learning ", "classification", "gemstone"],
+    tags=["deep_learning ", "classification", "tuberculosis"],
 ) as dag:
 
     dag.doc_md = __doc__
 
     def data_ingestion(**kwargs):
         ti = kwargs["ti"]
-        train_data_path, test_data_path = training_pipeline.start_data_ingestion()
+        imagetrain, imagetest, labeltrain, labeltest, imagesize = (
+            training_pipeline.start_data_ingestion()
+        )
         ti.xcom_push(
             "data_ingestion_artifact",
-            {"train_data_path": train_data_path, "test_data_path": test_data_path},
+            {
+                "train_images": imagetrain,
+                "test_images": imagetest,
+                "train_labels": labeltrain,
+                "test_labels": labeltest,
+                "image_size": imagesize,
+            },
         )
 
     def data_transformations(**kwargs):
@@ -46,24 +53,26 @@ with DAG(
         )
 
     def model_trainer(**kwargs):
-        import numpy as np
 
         ti = kwargs["ti"]
-        data_transformation_artifact = ti.xcom_pull(
-            task_ids="data_transformation", key="data_transformations_artifcat"
+        data_ingestion_artifact = ti.xcom_pull(
+            task_ids="data_ingestion", key="data_ingestion_artifact"
         )
-        train_arr = np.array(data_transformation_artifact["train_arr"])
-        test_arr = np.array(data_transformation_artifact["test_arr"])
-        training_pipeline.start_model_training(train_arr, test_arr)
+        # train_arr = np.array(data_transformation_artifact["train_arr"])
+        # test_arr = np.array(data_transformation_artifact["test_arr"])
+        train_images = data_ingestion_artifact["train_images"]
+        test_images = data_ingestion_artifact["test_images"]
+        train_labels = data_ingestion_artifact["train_labels"]
+        test_labels = data_ingestion_artifact["test_labels"]
+        image_size = data_ingestion_artifact["image_size"]
+        training_pipeline.start_model_training(
+            train_images, test_images, train_labels, test_labels, image_size
+        )
 
-    ## you have to config azure blob or s3
-    def push_data_to_s3(**kwargs):
-        import os
-
-        bucket_name = "reposatiory_name"
-        artifact_folder = "/app/artifacts"
-        # you can save it ti the azure blob
-        # os.system(f"aws s3 sync {artifact_folder} s3:/{bucket_name}/artifact")
+    # def push_data_to_s3(**kwargs):
+    #     bucket_name = "reposatiory_name"
+    #     artifact_folder = "/app/artifacts"
+    #     # os.system(f"aws s3 sync {artifact_folder} s3:/{bucket_name}/artifact")
 
     data_ingestion_task = PythonOperator(
         task_id="data_ingestion",
@@ -98,9 +107,10 @@ with DAG(
     """
     )
 
-    push_data_to_s3_task = PythonOperator(
-        task_id="push_data_to_s3", python_callable=push_data_to_s3
-    )
+    # push_data_to_s3_task = PythonOperator(
+    #     task_id="push_data_to_s3", python_callable=push_data_to_s3
+    # )
 
 
-data_ingestion_task >> data_transform_task >> model_trainer_task >> push_data_to_s3_task
+# data_ingestion_task  >> model_trainer_task >> push_data_to_s3_task
+data_ingestion_task >> model_trainer_task

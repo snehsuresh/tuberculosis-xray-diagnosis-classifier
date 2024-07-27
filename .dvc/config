@@ -1,0 +1,4 @@
+[core]
+    remote = remote_storage
+['remote "remote_storage"']
+    url = /Users/snehsuresh/Desktop/Projects/tuberculosis-xray-classifier/mlruns

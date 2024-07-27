@@ -4,7 +4,7 @@ services:
       context: ./
       dockerfile: Dockerfile.airflow
     image: airflowimage
-    container_name: gemstone-prediction-airflow
+    container_name: xray-diagnosis-airflow
     ports:
       - "8080:8080"
     
@@ -13,7 +13,7 @@ services:
       context: ./
       dockerfile: Dockerfile.flask
     image: flaskimage
-    container_name: gemstone-prediction-flask
+    container_name: xray-diagnosis-flask
     ports:
       - "80:80"
     

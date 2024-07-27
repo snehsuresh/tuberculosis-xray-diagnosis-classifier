@@ -6,7 +6,7 @@ import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-
+from src.components.data_ingestion import DataIngestion
 
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -90,7 +90,9 @@ class DataTransformation:
 
             raise customexception(e, sys)
 
-    def initialize_data_transformation(self, train_path, test_path):
+    def initialize_data_transformation(
+        self, imagetrain, imagetest, labeltrain, labeltest, imagesize
+    ):
         try:
             train_df = pd.read_csv(train_path)
             test_df = pd.read_csv(test_path)
