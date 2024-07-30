@@ -85,16 +85,17 @@ with DAG(
     """
     )
 
-    data_transform_task = PythonOperator(
-        task_id="data_transformation",
-        python_callable=data_transformations,
-    )
-    data_transform_task.doc_md = dedent(
-        """\
-    #### Transformation task
-    this task performs the transformation
-    """
-    )
+    # data_transform_task = PythonOperator(
+    #     task_id="data_transformation",
+    #     python_callable=data_transformations,
+    # )
+
+    # data_transform_task.doc_md = dedent(
+    #     """\
+    # #### Transformation task
+    # this task performs the transformation
+    # """
+    # )
 
     model_trainer_task = PythonOperator(
         task_id="model_trainer",

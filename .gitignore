@@ -163,3 +163,4 @@ mlruns/
 artifacts/
 
 .DS_Store
+*.dat

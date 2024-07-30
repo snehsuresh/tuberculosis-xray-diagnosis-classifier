@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from src.logger.loging import logging
 from src.exception.exception import customexception
-
+import cv2 as cv
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
 
@@ -53,3 +53,8 @@ def load_object(file_path):
     except Exception as e:
         logging.info("Exception Occured in load_object function utils")
         raise customexception(e, sys)
+
+
+def read_and_resize_image(image_path, size):
+    image = cv.imread(image_path, cv.IMREAD_GRAYSCALE)
+    return cv.resize(image, (size, size))

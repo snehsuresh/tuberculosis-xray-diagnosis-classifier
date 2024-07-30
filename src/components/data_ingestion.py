@@ -1,16 +1,15 @@
-import pandas as pd
-import numpy as np
-from src.logger.loging import logging
-from src.exception.exception import customexception
 import os
 import sys
-from sklearn.model_selection import train_test_split
-from dataclasses import dataclass
-from pathlib import Path
-import cv2 as cv
 import numpy as np
-from imblearn.over_sampling import SMOTE
+from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
+from memory_profiler import profile
+from src.logger.loging import logging
+from src.exception.exception import customexception
+from multiprocessing import Pool
+from functools import partial
+from src.utils.utils import read_and_resize_image
 
 
 @dataclass
@@ -34,61 +33,70 @@ class DataIngestionConfig:
 class DataIngestion:
     def __init__(self):
         self.ingestion_config = DataIngestionConfig()
+        # self.helper = Helper()
 
+    def process_images_in_batches(self, image_paths, batch_size):
+        images = []
+        labels = []
+        for i in range(0, len(image_paths), batch_size):
+            batch_paths = image_paths[i : i + batch_size]
+            with Pool() as pool:
+                # Use partial to pass additional arguments to the function
+                results = pool.map(
+                    partial(
+                        read_and_resize_image,
+                        size=self.ingestion_config.imagesize,
+                    ),
+                    batch_paths,
+                )
+            images.extend(results)
+            labels.extend([0 if "Normal" in path else 1 for path in batch_paths])
+        return np.array(images), np.array(labels)
+
+    def prepare_data(self, images, labels):
+        images = images.reshape(
+            -1, self.ingestion_config.imagesize * self.ingestion_config.imagesize
+        )
+        smote = SMOTE(random_state=42)
+        images, labels = smote.fit_resample(images, labels)
+        return (
+            images.reshape(
+                -1, self.ingestion_config.imagesize, self.ingestion_config.imagesize, 1
+            ),
+            labels,
+        )
+
+    @profile
     def initiate_data_ingestion(self):
-        logging.info("data ingestion started")
+        logging.info("Data ingestion started")
         try:
-            logging.info("Reading from Normal directory")
-            for x in os.listdir(self.ingestion_config.normal_data_path):
-                imagedir = os.path.join(self.ingestion_config.normal_data_path, x)
-                image = cv.imread(imagedir, cv.IMREAD_GRAYSCALE)
-                image = cv.resize(
-                    image,
-                    (self.ingestion_config.imagesize, self.ingestion_config.imagesize),
-                )
-                self.ingestion_config.images.append(image)
-                self.ingestion_config.labels.append(0)
-            logging.info("Reading from TB directory")
-            for y in os.listdir(self.ingestion_config.tuberculosis_data_path):
-                imagedir = os.path.join(self.ingestion_config.tuberculosis_data_path, y)
-                image = cv.imread(imagedir, cv.IMREAD_GRAYSCALE)
-                image = cv.resize(
-                    image,
-                    (self.ingestion_config.imagesize, self.ingestion_config.imagesize),
-                )
-                self.ingestion_config.images.append(image)
-                self.ingestion_config.labels.append(1)
+            normal_image_paths = [
+                os.path.join(self.ingestion_config.normal_data_path, x)
+                for x in os.listdir(self.ingestion_config.normal_data_path)
+            ]
+            tb_image_paths = [
+                os.path.join(self.ingestion_config.tuberculosis_data_path, y)
+                for y in os.listdir(self.ingestion_config.tuberculosis_data_path)
+            ]
 
-            images = np.array(self.ingestion_config.images)
-            labels = np.array(self.ingestion_config.labels)
+            normal_images, normal_labels = self.process_images_in_batches(
+                normal_image_paths, batch_size=50
+            )
+            tb_images, tb_labels = self.process_images_in_batches(
+                tb_image_paths, batch_size=20
+            )
 
-            # Splitting the images and labels into training and testing sets, then normalizing the values within them for computational efficiency (from 0-255 scale to 0-1 scale)
+            images = np.concatenate([normal_images, tb_images])
+            labels = np.concatenate([normal_labels, tb_labels])
+
             imagetrain, imagetest, labeltrain, labeltest = train_test_split(
                 images, labels, test_size=0.3, random_state=42
             )
-            imagetrain = (imagetrain.astype("float32")) / 255
-            imagetest = (imagetest.astype("float32")) / 255
+            imagetrain = imagetrain.astype("float32") / 255
+            imagetest = imagetest.astype("float32") / 255
 
-            # Flattening the image array into 2D (making it [2940 images] x [all the pixels of the image in just one 1D array]) to be suitable for SMOTE oversampling
-            imagetrain = imagetrain.reshape(
-                2940,
-                (
-                    self.ingestion_config.imagesize.imagesize
-                    * self.ingestion_config.imagesize.imagesize
-                ),
-            )
+            imagetrain, labeltrain = self.prepare_data(imagetrain, labeltrain)
 
-            # Performing oversampling
-            smote = SMOTE(random_state=42)
-            imagetrain, labeltrain = smote.fit_resample(imagetrain, labeltrain)
-
-            # Unflattening the images now to use them for convolutional neural network (4914 images of 256x256 size, with 1 color channel (grayscale, as compared to RGB with 3 color channels))
-            imagetrain = imagetrain.reshape(
-                -1,
-                self.ingestion_config.imagesize.imagesize,
-                self.ingestion_config.imagesize.imagesize,
-                1,
-            )
             print(imagetrain.shape)
             return (
                 imagetrain,
@@ -99,11 +107,10 @@ class DataIngestion:
             )
 
         except Exception as e:
-            logging.info()
+            logging.info("Exception occurred while ingesting data")
             raise customexception(e, sys)
 
 
 if __name__ == "__main__":
     obj = DataIngestion()
-
     obj.initiate_data_ingestion()

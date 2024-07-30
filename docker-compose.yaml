@@ -4,16 +4,23 @@ services:
       context: ./
       dockerfile: Dockerfile.airflow
     image: airflowimage
+    volumes:
+      - ./airflow/dags:/app/airflow/dags
     container_name: xray-diagnosis-airflow
     ports:
       - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 5g
+          cpus: '8'
     
-  flaskapp:
-    build:
-      context: ./
-      dockerfile: Dockerfile.flask
-    image: flaskimage
-    container_name: xray-diagnosis-flask
-    ports:
-      - "80:80"
+  # flaskapp:
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile.flask
+  #   image: flaskimage
+  #   container_name: xray-diagnosis-flask
+  #   ports:
+  #     - "80:80"
     

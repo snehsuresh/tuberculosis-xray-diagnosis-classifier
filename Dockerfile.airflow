@@ -1,15 +1,51 @@
-FROM python:3.8-slim-buster
-USER root
+# Start with the base image
+FROM python:3.9-slim-buster
+
+# Create the /app directory
 RUN mkdir /app
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies first
+RUN apt-get update && \
+    apt-get install -y \
+    gcc \
+    libhdf5-dev \
+    pkg-config \
+    zlib1g-dev \
+    libblas-dev \
+    liblapack-dev \
+    gfortran \
+    libgl1-mesa-glx
+
+# Copy the requirements file and install Python dependencies
+COPY requirements.txt ./
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Copy the rest of the application code
 COPY . /app/
-WORKDIR /app/
-RUN apt-get update &&  apt-get install -y gcc && pip3 install -r requirements.txt
+
+# Install and configure Airflow
+RUN airflow db init && \
+    airflow users create -e snehsuresh02@gmail.com -f sneh -l pillai -p admin -r Admin -u admin
+
+# Ensure the start script has execute permissions
+RUN chmod 777 start.sh
+
+# Set environment variables
 ENV AIRFLOW_HOME="/app/airflow"
 ENV AIRFLOW_CORE_DAGBAG_IMPORT_TIMEOUT=1000
 ENV AIRFLOW_CORE_ENABLE_XCOM_PICKLING=True
-RUN airflow db init
-RUN airflow users create -e snehsuresh02@gmail.com -f sneh -l pillai -p admin -r Admin -u admin
-RUN chmod 777 start.sh
+ENV AIRFLOW__CORE__KILLED_TASK_CLEANUP_TIME=604800
+ENV AIRFLOW__SCHEDULER__SCHEDULER_ZOMBIE_TASK_THRESHOLD=3000
+
+
+
+# Update apt and any other configurations
 RUN apt update -y
+
+# Specify the entrypoint and command
 ENTRYPOINT [ "/bin/sh" ]
 CMD ["start.sh"]

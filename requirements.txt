@@ -1,17 +1,16 @@
+apache-airflow
 pandas
 opencv-python
 numpy
 imbalanced-learn
 scikit-learn==1.1.3
-numpy
 seaborn
 ipykernel
 Flask
 #this is more stable version
 mlflow==2.2.2
 dvc
-apache-airflow
 tensorflow
 keras
-
--e .
+memory-profiler
+# -e .
