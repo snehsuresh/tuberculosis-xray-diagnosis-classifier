@@ -2,7 +2,7 @@ from src.components.data_ingestion import DataIngestion
 
 from src.components.model_trainer import ModelTrainer
 from src.components.model_evaluation import ModelEvaluation
-from src.components.model_testing import ModelTesting
+from src.components.model_tester import ModelTesting
 
 # import os
 import sys
@@ -26,22 +26,25 @@ class TrainingPipeline:
         except Exception as e:
             raise customexception(e, sys)
 
-    def start_model_training(
-        self, imagetrain, imagetest, labeltrain, labeltest, imagesize
-    ):
+    def start_model_training(self, imagetrain, labeltrain, imagesize):
         try:
             model_trainer = ModelTrainer()
-            model_trainer.initate_model_training(
-                imagetrain, imagetest, labeltrain, labeltest, imagesize
-            )
+            model_trainer.initate_model_training(imagetrain, labeltrain, imagesize)
         except Exception as e:
             raise customexception(e, sys)
 
-    def start_model_testing(
-        self,
-    ):
+    def start_model_testing(self, test_images, test_labels, image_size):
         try:
             model_tester = ModelTesting()
-            model_tester.initiate_model_testing()
+            report = model_tester.initiate_model_testing(test_images, test_labels)
+            return report
         except Exception as e:
             raise customexception(e, sys)
+
+    # def start_model_evaluation():
+    #     try:
+    #         model_evaluator = ModelEvaluation()
+    #         model_evaluator.initiate_model_testing(test_images, test_labels, image_size)
+    #         return predicted_labels, predictions
+    #     except Exception as e:
+    #         raise customexception(e, sys)

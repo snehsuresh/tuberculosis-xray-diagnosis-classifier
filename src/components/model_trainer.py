@@ -18,16 +18,13 @@ from src.logger.loging import logging
 @dataclass
 class ModelTrainerConfig:
     trained_model_file_path = os.path.join("artifacts", "model.pkl")
-    imagesize = 128
 
 
 class ModelTrainer:
     def __init__(self):
-        self.model_trainer_config = ModelTrainerConfig()
+        self.config = ModelTrainerConfig()
 
-    def initate_model_training(
-        self, imagetrain, imagetest, labeltrain, labeltest, imagesize
-    ):
+    def initate_model_training(self, imagetrain, labeltrain, imagesize):
         try:
             logging.info("Training Initiated")
             # The CNN model has 3 convolutional layers, each followed by pooling to summarize the features found by the layer, starting with 16 and multiplying by 2 each time for computational efficiency, as bits are structured in powers of 2. 3x3 filters and ReLU activation used.
@@ -36,8 +33,8 @@ class ModelTrainer:
                     # Input layer, same shape as all the images (256x256x1):
                     keras.Input(
                         shape=(
-                            self.model_trainer_config.imagesize,
-                            self.model_trainer_config.imagesize,
+                            imagesize,
+                            imagesize,
                             1,
                         )
                     ),
@@ -87,7 +84,7 @@ class ModelTrainer:
             )
 
             save_object(
-                file_path=self.model_trainer_config.trained_model_file_path,
+                file_path=self.config.trained_model_file_path,
                 obj=cnn,
             )
             logging.info("Training Ended")

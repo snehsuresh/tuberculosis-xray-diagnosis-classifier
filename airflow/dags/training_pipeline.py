@@ -64,37 +64,47 @@ with DAG(
         logging.info("Pulled XCom references successful!")
         # Extract file paths and other metadata
         train_images_path = data_ingestion_artifact["train_images_path"]
-        test_images_path = data_ingestion_artifact["test_images_path"]
         train_labels_path = data_ingestion_artifact["train_labels_path"]
-        test_labels_path = data_ingestion_artifact["test_labels_path"]
         image_size = data_ingestion_artifact["image_size"]
 
         # Load data from files
         with open(train_images_path, "rb") as f:
             train_images = np.array(pickle.load(f))
-
-        with open(test_images_path, "rb") as f:
-            test_images = np.array(pickle.load(f))
-
         with open(train_labels_path, "rb") as f:
             train_labels = np.array(pickle.load(f))
 
-        with open(test_labels_path, "rb") as f:
-            test_labels = np.array(pickle.load(f))
-
         logging.info("Starting model training.")
-        training_pipeline.start_model_training(
-            train_images, test_images, train_labels, test_labels, image_size
-        )
+        training_pipeline.start_model_training(train_images, train_labels, image_size)
 
         logging.info("Model training started.")
 
-    def model_testing(**kwargs):
+    def model_tester(**kwargs):
+        ti = kwargs["ti"]
+        # Pull the XCom data
+        data_ingestion_artifact = ti.xcom_pull(
+            task_ids="data_ingestion", key="data_ingestion_artifact"
+        )
+
+        logging.info("Pulled XCom references successful!")
+        # Extract file paths and other metadata
+        test_images_path = data_ingestion_artifact["test_images_path"]
+        test_labels_path = data_ingestion_artifact["test_labels_path"]
 
         logging.info("Testing begins..")
         # Extract file paths and other metadata
-        print("TESTING DATA:")
-        training_pipeline.start_model_testing()
+        with open(test_images_path, "rb") as f:
+            test_images = np.array(pickle.load(f))
+        with open(test_labels_path, "rb") as f:
+            test_labels = np.array(pickle.load(f))
+
+        report = training_pipeline.start_model_testing(test_images, test_labels)
+        logging.info("Testing Complete.")
+
+        base_path = "data/test_data"
+        logging.info(f"Saving evaluation report to {base_path} evaluation")
+        report.to_csv(base_path)
+
+        logging.info("Model Cycle Complete")
 
     # def push_data_to_s3(**kwargs):
     #     bucket_name = "reposatiory_name"
@@ -137,9 +147,9 @@ with DAG(
 
     model_testing_task = PythonOperator(
         task_id="model_tester",
-        python_callable=model_trainer,
+        python_callable=model_tester,
     )
-    model_trainer_task.doc_md = dedent(
+    model_testing_task.doc_md = dedent(
         """\
     #### model testing task
     this task performs testing
