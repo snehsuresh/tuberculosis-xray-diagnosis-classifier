@@ -7,6 +7,7 @@ from src.logger.loging import logging
 from src.exception.exception import customexception
 import cv2 as cv
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+from tensorflow.keras.models import load_model
 
 
 def save_object(file_path, obj):
@@ -58,3 +59,7 @@ def load_object(file_path):
 def read_and_resize_image(image_path, size):
     image = cv.imread(image_path, cv.IMREAD_GRAYSCALE)
     return cv.resize(image, (size, size))
+
+
+def load_model_from_file(file_path):
+    return load_model(file_path)

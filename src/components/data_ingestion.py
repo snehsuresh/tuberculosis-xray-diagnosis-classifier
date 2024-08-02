@@ -77,6 +77,7 @@ class DataIngestion:
         )
 
     def prepare_data(self, images, labels):
+        logging.info("inside prepare_data")
         images = images.reshape(
             -1, self.ingestion_config.imagesize * self.ingestion_config.imagesize
         )

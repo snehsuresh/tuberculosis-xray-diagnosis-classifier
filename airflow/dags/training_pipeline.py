@@ -89,6 +89,13 @@ with DAG(
 
         logging.info("Model training started.")
 
+    def model_testing(**kwargs):
+
+        logging.info("Testing begins..")
+        # Extract file paths and other metadata
+        print("TESTING DATA:")
+        training_pipeline.start_model_testing()
+
     # def push_data_to_s3(**kwargs):
     #     bucket_name = "reposatiory_name"
     #     artifact_folder = "/app/artifacts"
@@ -124,7 +131,18 @@ with DAG(
     model_trainer_task.doc_md = dedent(
         """\
     #### model trainer task
-    this task perform training
+    this task performs training
+    """
+    )
+
+    model_testing_task = PythonOperator(
+        task_id="model_tester",
+        python_callable=model_trainer,
+    )
+    model_trainer_task.doc_md = dedent(
+        """\
+    #### model testing task
+    this task performs testing
     """
     )
 
@@ -134,4 +152,4 @@ with DAG(
 
 
 # data_ingestion_task  >> model_trainer_task >> push_data_to_s3_task
-data_ingestion_task >> model_trainer_task
+data_ingestion_task >> model_trainer_task >> model_testing_task

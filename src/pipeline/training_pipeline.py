@@ -1,9 +1,8 @@
 from src.components.data_ingestion import DataIngestion
 
 from src.components.model_trainer import ModelTrainer
-
-# from src.components.model_evaluation import ModelEvaluation
-
+from src.components.model_evaluation import ModelEvaluation
+from src.components.model_testing import ModelTesting
 
 # import os
 import sys
@@ -35,5 +34,14 @@ class TrainingPipeline:
             model_trainer.initate_model_training(
                 imagetrain, imagetest, labeltrain, labeltest, imagesize
             )
+        except Exception as e:
+            raise customexception(e, sys)
+
+    def start_model_testing(
+        self,
+    ):
+        try:
+            model_tester = ModelTesting()
+            model_tester.initiate_model_testing()
         except Exception as e:
             raise customexception(e, sys)

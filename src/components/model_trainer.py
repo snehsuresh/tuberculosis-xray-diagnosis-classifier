@@ -18,7 +18,7 @@ from src.logger.loging import logging
 @dataclass
 class ModelTrainerConfig:
     trained_model_file_path = os.path.join("artifacts", "model.pkl")
-    imagesize = 256
+    imagesize = 128
 
 
 class ModelTrainer:
