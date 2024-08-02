@@ -12,9 +12,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 5g
-          cpus: '8'
-    
+          memory: 4g
+          cpus: '2'
+  
   # flaskapp:
   #   build:
   #     context: ./

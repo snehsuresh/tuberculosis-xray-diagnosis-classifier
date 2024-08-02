@@ -4,6 +4,10 @@ import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from src.pipeline.training_pipeline import TrainingPipeline
+import numpy as np
+from src.logger.loging import logging
+import pickle
+import os
 
 training_pipeline = TrainingPipeline()
 
@@ -25,16 +29,29 @@ with DAG(
         imagetrain, imagetest, labeltrain, labeltest, imagesize = (
             training_pipeline.start_data_ingestion()
         )
+        logging.info("Proceeding to save data to files")
+        base_path = "data/ingested_data"
+        with open(os.path.join(base_path, "train_images.pkl"), "wb") as f:
+            pickle.dump(imagetrain, f)
+        with open(os.path.join(base_path, "test_images.pkl"), "wb") as f:
+            pickle.dump(imagetest, f)
+        with open(os.path.join(base_path, "train_labels.pkl"), "wb") as f:
+            pickle.dump(labeltrain, f)
+        with open(os.path.join(base_path, "test_labels.pkl"), "wb") as f:
+            pickle.dump(labeltest, f)
+        # Push references to XCom
+        logging.info("Proceeding to push XCom references")
         ti.xcom_push(
             "data_ingestion_artifact",
             {
-                "train_images": imagetrain,
-                "test_images": imagetest,
-                "train_labels": labeltrain,
-                "test_labels": labeltest,
+                "train_images_path": os.path.join(base_path, "train_images.pkl"),
+                "test_images_path": os.path.join(base_path, "test_images.pkl"),
+                "train_labels_path": os.path.join(base_path, "train_labels.pkl"),
+                "test_labels_path": os.path.join(base_path, "test_labels.pkl"),
                 "image_size": imagesize,
             },
         )
+        logging.info("Completed XCom push")
 
     def data_transformations(**kwargs):
         ti = kwargs["ti"]
@@ -53,17 +70,14 @@ with DAG(
         )
 
     def model_trainer(**kwargs):
-
         ti = kwargs["ti"]
         data_ingestion_artifact = ti.xcom_pull(
             task_ids="data_ingestion", key="data_ingestion_artifact"
         )
-        # train_arr = np.array(data_transformation_artifact["train_arr"])
-        # test_arr = np.array(data_transformation_artifact["test_arr"])
-        train_images = data_ingestion_artifact["train_images"]
-        test_images = data_ingestion_artifact["test_images"]
-        train_labels = data_ingestion_artifact["train_labels"]
-        test_labels = data_ingestion_artifact["test_labels"]
+        train_images = np.array(data_ingestion_artifact["train_images"])
+        test_images = np.array(data_ingestion_artifact["test_images"])
+        train_labels = np.array(data_ingestion_artifact["train_labels"])
+        test_labels = np.array(data_ingestion_artifact["test_labels"])
         image_size = data_ingestion_artifact["image_size"]
         training_pipeline.start_model_training(
             train_images, test_images, train_labels, test_labels, image_size

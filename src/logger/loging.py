@@ -16,4 +16,3 @@ logging.basicConfig(
     filename=LOG_FILEPATH,
     format="[%(asctime)s] %(lineno)d %(name)s - %(levelname)s - %(message)s",
 )
-# [2024-01-10 15:57:26,997] 6 root - INFO -  this my second tesgting
