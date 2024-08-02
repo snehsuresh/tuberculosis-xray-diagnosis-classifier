@@ -53,35 +53,41 @@ with DAG(
         )
         logging.info("Completed XCom push")
 
-    def data_transformations(**kwargs):
-        ti = kwargs["ti"]
-        data_ingestion_artifact = ti.xcom_pull(
-            task_ids="data_ingestion", key="data_ingestion_artifact"
-        )
-        train_arr, test_arr = training_pipeline.start_data_transformation(
-            data_ingestion_artifact["train_data_path"],
-            data_ingestion_artifact["test_data_path"],
-        )
-        train_arr = train_arr.tolist()
-        test_arr = test_arr.tolist()
-        ti.xcom_push(
-            "data_transformations_artifcat",
-            {"train_arr": train_arr, "test_arr": test_arr},
-        )
-
     def model_trainer(**kwargs):
         ti = kwargs["ti"]
+
+        # Pull the XCom data
         data_ingestion_artifact = ti.xcom_pull(
             task_ids="data_ingestion", key="data_ingestion_artifact"
         )
-        train_images = np.array(data_ingestion_artifact["train_images"])
-        test_images = np.array(data_ingestion_artifact["test_images"])
-        train_labels = np.array(data_ingestion_artifact["train_labels"])
-        test_labels = np.array(data_ingestion_artifact["test_labels"])
+
+        logging.info("Pulled XCom references successful!")
+        # Extract file paths and other metadata
+        train_images_path = data_ingestion_artifact["train_images_path"]
+        test_images_path = data_ingestion_artifact["test_images_path"]
+        train_labels_path = data_ingestion_artifact["train_labels_path"]
+        test_labels_path = data_ingestion_artifact["test_labels_path"]
         image_size = data_ingestion_artifact["image_size"]
+
+        # Load data from files
+        with open(train_images_path, "rb") as f:
+            train_images = np.array(pickle.load(f))
+
+        with open(test_images_path, "rb") as f:
+            test_images = np.array(pickle.load(f))
+
+        with open(train_labels_path, "rb") as f:
+            train_labels = np.array(pickle.load(f))
+
+        with open(test_labels_path, "rb") as f:
+            test_labels = np.array(pickle.load(f))
+
+        logging.info("Starting model training.")
         training_pipeline.start_model_training(
             train_images, test_images, train_labels, test_labels, image_size
         )
+
+        logging.info("Model training started.")
 
     # def push_data_to_s3(**kwargs):
     #     bucket_name = "reposatiory_name"

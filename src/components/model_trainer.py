@@ -12,6 +12,7 @@ from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from src.utils.utils import save_object, evaluate_model
 from keras.callbacks import ReduceLROnPlateau
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+from src.logger.loging import logging
 
 
 @dataclass
@@ -89,7 +90,7 @@ class ModelTrainer:
                 file_path=self.model_trainer_config.trained_model_file_path,
                 obj=cnn,
             )
-
+            logging.info("Training Ended")
         except Exception as e:
             logging.info("Exception occured at Model Training")
             raise customexception(e, sys)

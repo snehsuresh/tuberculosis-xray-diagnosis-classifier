@@ -27,40 +27,13 @@ class TrainingPipeline:
         except Exception as e:
             raise customexception(e, sys)
 
-    # def start_data_transformation(
-    #     self, imagetrain, imagetest, labeltrain, labeltest, imagesize
-    # ):
-
-    #     try:
-    #         data_transformation = DataTransformation()
-    #         train_arr, test_arr = data_transformation.initialize_data_transformation(
-    #             imagetrain, imagetest, labeltrain, labeltest, imagesize
-    #         )
-    #         return train_arr, test_arr
-    #     except Exception as e:
-    #         raise customexception(e, sys)
-
-    def start_model_training(imagetrain, imagetest, labeltrain, labeltest, imagesize):
+    def start_model_training(
+        self, imagetrain, imagetest, labeltrain, labeltest, imagesize
+    ):
         try:
             model_trainer = ModelTrainer()
             model_trainer.initate_model_training(
                 imagetrain, imagetest, labeltrain, labeltest, imagesize
             )
-        except Exception as e:
-            raise customexception(e, sys)
-
-    def start_trainig(self):
-        try:
-            imagetrain, imagetest, labeltrain, labeltest, imagesize = (
-                self.start_data_ingestion()
-            )
-            # train_arr, test_arr = self.start_data_transformation(
-            #     imagetrain, imagetest, labeltrain, labeltest, imagesize
-            # )
-            logging.info("Completed Ingestion")
-
-            # self.start_model_training(
-            #     imagetrain, imagetest, labeltrain, labeltest, imagesize
-            # )
         except Exception as e:
             raise customexception(e, sys)
