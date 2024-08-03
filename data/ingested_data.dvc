@@ -1,0 +1,6 @@
+outs:
+- md5: e2a1c1920b11197e9d73f2879b8d6776.dir
+  size: 404626071
+  nfiles: 4
+  hash: md5
+  path: ingested_data
