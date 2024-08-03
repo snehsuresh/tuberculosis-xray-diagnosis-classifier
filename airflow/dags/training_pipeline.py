@@ -31,6 +31,7 @@ with DAG(
         )
         logging.info("Proceeding to save data to files")
         base_path = "data/ingested_data"
+        os.makedirs(base_path, exist_ok=True)
         with open(os.path.join(base_path, "train_images.pkl"), "wb") as f:
             pickle.dump(imagetrain, f)
         with open(os.path.join(base_path, "test_images.pkl"), "wb") as f:

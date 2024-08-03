@@ -169,3 +169,4 @@ airflow/airflow-webserver.pid
 airflow/airflow.db
 data/
 airflow/logs
+dvc-remote/

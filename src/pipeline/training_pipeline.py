@@ -52,12 +52,15 @@ class TrainingPipeline:
 
 if __name__ == "__main__":
     pipeline = TrainingPipeline()
+
+    # Ingesting
     imagetrain, imagetest, labeltrain, labeltest, imagesize = (
         pipeline.start_data_ingestion()
     )
     pipeline.start_model_training(imagetrain, labeltrain, imagesize)
-    report = pipeline.start_model_testing(imagetest, labeltest)
+
     base_path = "data/ingested_data"
+    os.makedirs(base_path, exist_ok=True)
     with open(os.path.join(base_path, "train_images.pkl"), "wb") as f:
         pickle.dump(imagetrain, f)
     with open(os.path.join(base_path, "test_images.pkl"), "wb") as f:
@@ -67,9 +70,10 @@ if __name__ == "__main__":
     with open(os.path.join(base_path, "test_labels.pkl"), "wb") as f:
         pickle.dump(labeltest, f)
 
-    with open(base_path, "rb") as f:
+    # Training
+    with open(os.path.join(base_path, "train_images.pkl"), "rb") as f:
         train_images = np.array(pickle.load(f))
-    with open(base_path, "rb") as f:
+    with open(os.path.join(base_path, "train_labels.pkl"), "rb") as f:
         train_labels = np.array(pickle.load(f))
 
     logging.info("Starting model training.")

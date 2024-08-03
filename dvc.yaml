@@ -8,4 +8,4 @@ stages:
 
     outs:
       - data/ingested_data
-      - artifacts/model.pkl
+      - artifacts/model.h5
