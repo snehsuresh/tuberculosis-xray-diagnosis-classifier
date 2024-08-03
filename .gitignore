@@ -164,3 +164,8 @@ artifacts/
 
 .DS_Store
 *.dat
+airflow/airflow.cfg
+airflow/airflow-webserver.pid
+airflow/airflow.db
+data/
+airflow/logs

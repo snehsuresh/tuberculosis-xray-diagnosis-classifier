@@ -1,0 +1,37 @@
+# Start with the base image
+FROM python:3.9-slim-buster
+
+# Create the /app directory
+RUN mkdir /app
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    gcc \
+    libhdf5-dev \
+    pkg-config \
+    zlib1g-dev \
+    libblas-dev \
+    liblapack-dev \
+    gfortran \
+    libgl1-mesa-glx
+
+# Copy the requirements file and install Python dependencies
+COPY requirements.txt ./
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Copy the rest of the application code
+COPY . /app/
+
+# Ensure that /app is present in both images
+RUN mkdir -p /app/airflow /app/flask
+
+# Set environment variables if needed (these can be overridden in the derived Dockerfiles)
+ENV AIRFLOW_HOME="/app/airflow"
+
+# Update apt and any other configurations
+RUN apt update -y

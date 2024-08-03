@@ -10,19 +10,23 @@ import os
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
-
 # Path to your trained model
 trained_model_file_path = os.path.join("artifacts", "model.h5")
-model = load_model_from_file(trained_model_file_path)
 
 
 # Helper function to preprocess the image
 def preprocess_image(image):
     # Resize the image to match the model's expected input size
-    image = image.resize((256, 256))  # Assuming the model expects 256x256
+    image = image.resize((128, 128))  # Model expects 128x128
     image_array = np.array(image)
     image_array = image_array.astype("float32") / 255.0
-    image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+
+    # If the model expects a single channel, ensure that the image array has only one channel
+    if image_array.ndim == 3 and image_array.shape[-1] == 3:  # Convert RGB to grayscale
+        image_array = np.mean(image_array, axis=-1, keepdims=True)
+
+    # Add batch dimension (make it (1, 128, 128, 1))
+    image_array = np.expand_dims(image_array, axis=0)
     return image_array
 
 
@@ -33,6 +37,7 @@ def home_page():
 
 @app.route("/predict", methods=["GET", "POST"])
 def predict_datapoint():
+    model = load_model_from_file(trained_model_file_path)
     if request.method == "GET":
         return render_template("form.html")
 
@@ -46,7 +51,9 @@ def predict_datapoint():
                 return jsonify({"error": "No selected file"}), 400
             if file:
                 # Read and preprocess the image
-                image = Image.open(io.BytesIO(file.read()))
+                image = Image.open(io.BytesIO(file.read())).convert(
+                    "RGB"
+                )  # Ensure image is in RGB mode
                 image_array = preprocess_image(image)
 
                 # Make prediction

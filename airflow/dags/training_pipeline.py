@@ -100,8 +100,12 @@ with DAG(
         report = training_pipeline.start_model_testing(test_images, test_labels)
         logging.info("Testing Complete.")
 
-        base_path = "data/test_data"
-        logging.info(f"Saving evaluation report to {base_path} evaluation")
+        base_path = "data/test_data/evaluation_report.csv"
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(base_path), exist_ok=True)
+        logging.info(
+            f"Saving evaluation report to {os.path.dirname(base_path)} evaluation"
+        )
         report.to_csv(base_path)
 
         logging.info("Model Cycle Complete")

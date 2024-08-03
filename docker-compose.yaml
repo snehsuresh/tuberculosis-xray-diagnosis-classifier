@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.airflow
     image: airflowimage
     volumes:
-      - ./airflow/dags:/app/airflow/dags
+      - ./:/app/
     container_name: xray-diagnosis-airflow
     ports:
       - "8080:8080"
@@ -20,6 +20,8 @@ services:
       context: ./
       dockerfile: Dockerfile.flask
     image: flaskimage
+    volumes:
+      - ./:/app/
     container_name: xray-diagnosis-flask
     ports:
       - "80:80"
