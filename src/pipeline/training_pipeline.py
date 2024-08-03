@@ -33,7 +33,7 @@ class TrainingPipeline:
         except Exception as e:
             raise customexception(e, sys)
 
-    def start_model_testing(self, test_images, test_labels, image_size):
+    def start_model_testing(self, test_images, test_labels):
         try:
             model_tester = ModelTesting()
             report = model_tester.initiate_model_testing(test_images, test_labels)

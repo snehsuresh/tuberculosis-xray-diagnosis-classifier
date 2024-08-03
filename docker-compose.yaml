@@ -15,12 +15,11 @@ services:
           memory: 8g
           cpus: '4'
   
-  # flaskapp:
-  #   build:
-  #     context: ./
-  #     dockerfile: Dockerfile.flask
-  #   image: flaskimage
-  #   container_name: xray-diagnosis-flask
-  #   ports:
-  #     - "80:80"
-    
+  flaskapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile.flask
+    image: flaskimage
+    container_name: xray-diagnosis-flask
+    ports:
+      - "80:80"

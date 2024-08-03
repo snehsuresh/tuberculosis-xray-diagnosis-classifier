@@ -17,7 +17,7 @@ from src.logger.loging import logging
 
 @dataclass
 class ModelTrainerConfig:
-    trained_model_file_path = os.path.join("artifacts", "model.pkl")
+    trained_model_file_path = os.path.join("artifacts", "model.h5")
 
 
 class ModelTrainer:
@@ -83,10 +83,7 @@ class ModelTrainer:
                 callbacks=[reduce_lr],
             )
 
-            save_object(
-                file_path=self.config.trained_model_file_path,
-                obj=cnn,
-            )
+            cnn.save(self.config.trained_model_file_path)
             logging.info("Training Ended")
         except Exception as e:
             logging.info("Exception occured at Model Training")

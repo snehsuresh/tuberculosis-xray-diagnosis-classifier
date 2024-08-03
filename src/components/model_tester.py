@@ -16,7 +16,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 @dataclass
 class ModelTesterConfig:
-    trained_model_file_path = os.path.join("artifacts", "model.pkl")
+    trained_model_file_path = os.path.join("artifacts", "model.h5")
 
 
 class ModelTesting:
@@ -36,7 +36,9 @@ class ModelTesting:
             predictions = cnn.predict(imagetest, batch_size=32)
             predicted_labels = (predictions > 0.5).astype("int32")
 
-            report = classification_report(labeltest, predicted_labels)
+            report = classification_report(
+                labeltest, predicted_labels, output_dict=True
+            )
             confusion = confusion_matrix(labeltest, predicted_labels)
             logging.info(report)
             logging.info(confusion)

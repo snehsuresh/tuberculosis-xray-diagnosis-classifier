@@ -5,7 +5,7 @@ from src.logger.loging import logging
 from src.exception.exception import customexception
 import cv2 as cv
 from sklearn.metrics import r2_score
-from tensorflow.keras.models import load_model
+import tensorflow as tf
 
 
 def save_object(file_path, obj):
@@ -60,4 +60,4 @@ def read_and_resize_image(image_path, size):
 
 
 def load_model_from_file(file_path):
-    return load_model(file_path)
+    return tf.keras.models.load_model(file_path)

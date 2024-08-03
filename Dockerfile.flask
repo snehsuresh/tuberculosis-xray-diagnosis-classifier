@@ -1,0 +1,36 @@
+# Start with the base image
+FROM python:3.9-slim-buster
+
+# Create the /app directory
+RUN mkdir /app
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies first
+RUN apt-get update && \
+    apt-get install -y \
+    gcc \
+    libhdf5-dev \
+    pkg-config \
+    zlib1g-dev \
+    libblas-dev \
+    liblapack-dev \
+    gfortran \
+    libgl1-mesa-glx
+
+# Copy the requirements file and install Python dependencies
+COPY requirements_flask.txt ./
+RUN pip install --upgrade pip && \
+    pip install -r requirements_flask.txt
+
+# Copy the rest of the application code
+COPY . /app/
+
+# Update apt and any other configurations
+RUN apt update -y
+
+# Specify the entrypoint and command
+ENTRYPOINT [ "/bin/sh" ]
+
+CMD ["python3", "app.py"]
