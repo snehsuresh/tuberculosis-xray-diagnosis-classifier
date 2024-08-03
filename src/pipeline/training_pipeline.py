@@ -1,11 +1,11 @@
 from src.components.data_ingestion import DataIngestion
 
 from src.components.model_trainer import ModelTrainer
-from src.components.model_evaluation import ModelEvaluation
 from src.components.model_tester import ModelTesting
-
-# import os
+import pickle
+import os
 import sys
+import numpy as np
 
 # from src.logger import loging
 from src.exception.exception import customexception
@@ -48,3 +48,29 @@ class TrainingPipeline:
     #         return predicted_labels, predictions
     #     except Exception as e:
     #         raise customexception(e, sys)
+
+
+if __name__ == "__main__":
+    pipeline = TrainingPipeline()
+    imagetrain, imagetest, labeltrain, labeltest, imagesize = (
+        pipeline.start_data_ingestion()
+    )
+    pipeline.start_model_training(imagetrain, labeltrain, imagesize)
+    report = pipeline.start_model_testing(imagetest, labeltest)
+    base_path = "data/ingested_data"
+    with open(os.path.join(base_path, "train_images.pkl"), "wb") as f:
+        pickle.dump(imagetrain, f)
+    with open(os.path.join(base_path, "test_images.pkl"), "wb") as f:
+        pickle.dump(imagetest, f)
+    with open(os.path.join(base_path, "train_labels.pkl"), "wb") as f:
+        pickle.dump(labeltrain, f)
+    with open(os.path.join(base_path, "test_labels.pkl"), "wb") as f:
+        pickle.dump(labeltest, f)
+
+    with open(base_path, "rb") as f:
+        train_images = np.array(pickle.load(f))
+    with open(base_path, "rb") as f:
+        train_labels = np.array(pickle.load(f))
+
+    logging.info("Starting model training.")
+    pipeline.start_model_training(train_images, train_labels, imagesize)
