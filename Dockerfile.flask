@@ -1,7 +1,0 @@
-# Start with the base image
-FROM my-base-image:latest
-
-WORKDIR /app
-
-RUN apt update -y
-CMD ["python3", "app.py"]

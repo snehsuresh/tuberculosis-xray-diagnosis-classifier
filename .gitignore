@@ -170,3 +170,22 @@ airflow/airflow.db
 data/
 airflow/logs
 dvc-remote/
+
+
+# Not needed for deploy for predictions
+airflow/
+dvc-remote/
+logs/
+.dvcignore
+.dockerignore
+docker-compose.yaml
+Dockerfile.airflow
+Dockerfile.base
+Dockerfile.Flask
+dvc.lock
+dvc.yaml
+init_setup.sh
+requirements_dev.txt
+template.py
+.dvc
+dvc.yaml
