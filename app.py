@@ -39,6 +39,7 @@ def home_page():
 @app.route("/predict", methods=["GET", "POST"])
 def predict_datapoint():
     model = load_model_from_file(trained_model_file_path)
+    print("Model loaded=>", model)
     if request.method == "GET":
         return render_template("form.html")
 
