@@ -5,6 +5,7 @@ import io
 import logging
 from src.utils.utils import load_model_from_file
 import os
+import base64
 
 # Enable logging
 logging.basicConfig(level=logging.DEBUG)
@@ -62,8 +63,17 @@ def predict_datapoint():
 
                 # Result interpretation
                 result = "Tuberculosis" if predicted_label == 1 else "Normal"
-
-                return render_template("result.html", final_result=result)
+                buffered = io.BytesIO()
+                image.save(buffered, format="JPEG")
+                img_str = (
+                    "data:image/jpeg;base64,"
+                    + base64.b64encode(buffered.getvalue()).decode()
+                )
+                return render_template(
+                    "result.html",
+                    final_result=result,
+                    image_url=img_str,
+                )
         except Exception as e:
             app.logger.error(f"Error occurred: {e}")
             return jsonify({"error": str(e)}), 500
